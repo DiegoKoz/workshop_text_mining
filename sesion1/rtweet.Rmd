@@ -1,10 +1,10 @@
 ---
-title: "Sesion 1"
+title: "Aplicación: Descarga de Tweets, limpieza y nube de palabras"
 output: html_notebook
 ---
 
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 # install.packages("rtweet")
 library(rtweet)
 library(tidyverse)
@@ -14,7 +14,8 @@ library(wordcloud2)
 
 
 ```{r}
-rt <- search_tweets(q = "#QueSeaLey OR #AbortoLegal OR ##AbortoLegalYa",type = "recent", n = 18000, include_rts = FALSE)
+rt <- search_tweets(q = "#NLP OR #datascience OR text mining OR #textmining OR #TextMining  OR NLP",type = "recent", n = 18000, include_rts = FALSE)
+# rt <- search_tweets(q = "#QueSeaLey OR #AbortoLegal OR ##AbortoLegalYa",type = "recent", n = 18000, include_rts = FALSE)
 ```
 
 ```{r}
@@ -52,7 +53,7 @@ rt %>%
 
 
 ```{r}
-texto <-  rt$text
+texto <-  rt$text 
 ```
 
 
