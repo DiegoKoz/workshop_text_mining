@@ -1,0 +1,137 @@
+---
+title: "Discursos Presidenciales"
+output: html_notebook
+---
+
+fuente: https://github.com/DiegoKoz/discursos_presidenciales 
+
+```{r}
+library(tidyverse)
+library(glue)
+library(tm)
+library(topicmodels)
+library(tidytext)
+library(stringi)
+library(LDAvis)
+library(slam)
+library(tsne)
+library(lubridate)
+```
+
+```{r}
+df <- read_rds('data/discursos_presidenciales.rds')
+
+df <- df %>% 
+  mutate(texto = tolower(texto),
+         texto = stri_trans_general(texto, "Latin-ASCII"),
+         texto = str_trim(texto,side = 'both'),
+         texto = str_replace_all(texto,'\t',' '),
+         texto = str_replace_all(texto,'\n',' '),
+         texto = str_replace_all(texto,'\r',' '),
+         texto = str_replace_all(texto,'[[:punct:]]',' '),
+         texto = str_replace_all(texto,'\\d','NUM'),
+         texto = str_replace_all(texto,'(NUM)+','NUM'),
+         texto = str_replace_all(texto,"\\s+", " "))
+
+
+```
+
+
+```{r}
+
+palabras_comunes <- read_csv(file = 'data/r_words.txt',col_names = F)
+
+palabras_comunes <-stri_trans_general(palabras_comunes$X1, "Latin-ASCII")
+palabras_comunes <- unique(palabras_comunes)
+
+texto <- df$texto
+
+Corpus = VCorpus(VectorSource(texto))
+Corpus = tm_map(Corpus, removeWords, c(stopwords(kind = "es"),palabras_comunes))
+# Corpus <- tm_map(Corpus, stemDocument, language = "spanish") # Corpus  
+
+dtm <- DocumentTermMatrix(Corpus)
+tm::nTerms(dtm)
+#elimino los docuemntos vacios
+rowTotals <- apply(dtm , 1, sum)
+nDocs(dtm)
+dtm   <- dtm[rowTotals> 0, ]
+nDocs(dtm)
+```
+
+```{r}
+
+lda_fit <- LDA(dtm, k = 10,method = "Gibbs", control = list(delta=0.6,seed = 1234))
+lda_fit
+```
+
+```{r}
+Terms <- terms(lda_fit, 10)
+Terms
+```
+
+
+
+Visualizacion
+
+
+
+
+```{r}
+topicmodels_json_ldavis <- function(fitted, dtm){
+    svd_tsne <- function(x) tsne(svd(x)$u)
+
+    # Find required quantities
+    phi <- as.matrix(posterior(fitted)$terms)
+    theta <- as.matrix(posterior(fitted)$topics)
+    vocab <- colnames(phi)
+    term_freq <- slam::col_sums(dtm)
+
+    # Convert to json
+    json_lda <- LDAvis::createJSON(phi = phi, theta = theta,
+                            vocab = vocab,
+                            mds.method = svd_tsne,
+                            plot.opts = list(xlab="tsne", ylab=""),
+                            doc.length = as.vector(table(dtm$i)),
+                            term.frequency = term_freq)
+
+    return(json_lda)
+}
+```
+
+```{r}
+json_res <- topicmodels_json_ldavis(lda_fit, dtm)
+
+serVis(json_res)
+```
+
+
+
+
+```{r}
+theta <- as.matrix(posterior(lda_fit)$topics)
+
+theta <- as_tibble(theta)
+
+dist_topicos <- df[which(rowTotals>0),] %>%  #tengo que eliminar ese docuemnto que estaba vacio
+  select(fecha,titulo) %>% 
+  bind_cols(theta)
+
+```
+
+```{r}
+
+dist_topicos <- dist_topicos %>% 
+  select(-titulo) %>% 
+  mutate(fecha = floor_date(fecha,'month')) %>% 
+  group_by(fecha) %>% 
+  summarise_all(mean)
+```
+
+```{r}
+dist_topicos %>% 
+  gather(topico,proporcion_promedio, 2:11) %>% 
+  ggplot(., aes(fecha,proporcion_promedio, color=topico)) +
+  geom_line()
+```
+

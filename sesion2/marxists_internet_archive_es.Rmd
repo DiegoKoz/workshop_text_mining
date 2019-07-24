@@ -1,0 +1,18 @@
+---
+title: "Marxists Internet Archive"
+output: html_notebook
+---
+
+fuente: https://github.com/DiegoKoz/MIA_text_mining
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+
+df <- read_rds('data/MIA.RDS')
+
+```
+

@@ -1,0 +1,41 @@
+---
+title: "Tweets Aborto"
+output: html_notebook
+---
+
+fuente: https://github.com/pablocelayes/twitter-aborto
+
+```{r warning=FALSE}
+# library(rjson)
+library(jsonlite)
+
+```
+
+
+```{r}
+tweet_no <- fromJSON(txt = 'data/aborto_twitter/tweets_no.json',flatten = TRUE )
+tweet_si <- fromJSON(txt = 'data/aborto_twitter/tweets_si.json',flatten = TRUE )
+
+```
+
+```{r}
+range(tweet_si$created_at)
+
+columnas <- c('id','text','favorite_count','retweet_count', 'created_at','user.statuses_count','user.description','user.friends_count')
+
+
+df <- tweet_no %>% 
+  select(columnas) %>% 
+  mutate(grupo='antiIVE') %>% 
+  bind_rows(
+  tweet_si %>% 
+  select(columnas) %>% 
+  mutate(grupo='proIVE'))
+  
+```
+
+
+```{r}
+df
+```
+
