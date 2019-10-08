@@ -1,0 +1,3 @@
+aborto_twitter: Tweets relacionados a la discusión del aborto entre el 16 y el 17 de abril de 2018.  Tomados de https://github.com/pablocelayes/twitter-aborto 
+MIA: Textos en español escrapeados de https://www.marxists.org/espanol/. Tomados de https://github.com/DiegoKoz/MIA_text_mining
+discursos_presidenciales: discursos presidenciales Macri entre 2015-12-10 y 2019-07-19. Tomados de https://github.com/DiegoKoz/discursos_presidenciales

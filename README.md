@@ -1,22 +1,31 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Hands On Text Mining y NLP
+# Workshop Para mineria de texto
 
-<!-- badges: start -->
+## Materiales:
 
-<!-- badges: end -->
+  - [Explicacion](1_explicacion.nb.html)
+  - [Práctica Guiada](2_practica_guiada.nb.html)
+  - [Práctica Independiente](3_practica_independiente.nb.html)
 
-Workshop Para mineria de texto.
+## Temario:
 
-### Sesión AM:
-
-  - Intro al análisis de textos, limpieza, preprocesamiento, BoW,
-    stopwords, TF-IDF
-  - Práctica Guiada (2hs): Escrapeo de algún de TW. + limpieza +
-    Wordcloud
-
-### Sesión PM:
-
-  - Similitud Coseno, Topic Modelling (LDA)
-  - Práctica no guiada(2hs): Aplicar LDA a un Corpus + LDAviz.
+  - Introducción
+  - Análisis de texto en Ciencias Sociales
+  - Bag of Words
+  - Normalización
+      - Caracteres especiales.
+  - Distancia de palabras
+  - Distancia de caracteres
+  - Distancia Conceptual
+  - Distancia de Documentos
+      - Similitud Coseno
+  - Topic Modelling
+  - Implementaciones en R:
+      - rtweet
+      - tm
+      - RVerbalExpressions
+      - wordcloud2
+      - LDAvis
+      - tsne
