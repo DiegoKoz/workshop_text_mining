@@ -95,12 +95,17 @@ gc()
 
 
 
-```{r}
+```{r eval=FALSE}
 lda_fit <- LDA(dtm, k = 10,method = "Gibbs", control = list(delta=0.6,seed = 1234))
 lda_fit
 
 saveRDS(lda_fit, 'modelos/MIA_lda.rds') # Tarda mucho en correr, asi que guardamos los resultados
 ```
+
+```{r}
+lda_fit <- readRDS('modelos/MIA_lda.rds')
+```
+
 
 ```{r}
 Terms <- terms(lda_fit, 10)

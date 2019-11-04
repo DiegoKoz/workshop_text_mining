@@ -49,7 +49,7 @@ output:
 __Ejemplo__: opiniones de trip advisor:
 
 
-```{r warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(tm)
 doc1='Lugar espectacular e inolvidable'
