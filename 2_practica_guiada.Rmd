@@ -25,7 +25,7 @@ library(tsne)
 
 
 ```{r eval=FALSE}
-rt <- search_tweets(q = "#NLP OR #datascience OR text mining OR #textmining OR #TextMining  OR NLP",type = "mixed", n = 18000, include_rts = FALSE)
+rt <- search_tweets(q = "Bolivia OR bolivia OR Evo",type = "mixed", n = 18000, include_rts = FALSE)
 
 saveRDS(rt,'fuentes/rt.RDS')
 ```
@@ -40,6 +40,7 @@ rt %>%
   sample_n(10)
 ```
 
+
 ```{r}
 range(rt$created_at)
 ```
@@ -48,13 +49,15 @@ Nos da los tweets de los últimos nueve días, o el máximo que indicamos más r
 
 ```{r}
 rt %>%
-  ts_plot("3 hours") +
+  ts_plot(by = "minutes") +
   ggplot2::theme_minimal() +
   ggplot2::theme(plot.title = ggplot2::element_text(face = "bold")) +
   ggplot2::labs(
     x = NULL, y = NULL,
     title = "Frecuencia de los tweets relacionados NLP",
-    subtitle = "Agregado a intervalos de tres horas")
+    subtitle = "Agregado a intervalos de tres horas")+
+  scale_x_datetime(limits = c((max(rt$created_at)- 12800),max(rt$created_at)))
+
 ```
 
 - Me quedo con el texto
@@ -69,7 +72,7 @@ Este texto es necesario limpiarlo para que sea más fácil de utilizar.
 
 ### Armado del corpus con `tm`
 
-- Primero creo un objeto de tipo Corpus. Utilizamos algo distinto a los conocidos vectores of dataframes porque es un objeto optimizado para trabajar con texto. Esto nos permite que los procesos sean mucho más eficientes, y por lo tanto trabajar con grandes corpus de manera rápida
+- Primero creo un objeto de tipo Corpus. Utilizamos algo distinto a los conocidos vectores o dataframes porque es un objeto optimizado para trabajar con texto. Esto nos permite que los procesos sean mucho más eficientes, y por lo tanto trabajar con grandes corpus de manera rápida
 
 ```{r}
 myCorpus = Corpus(VectorSource(texto))
@@ -78,7 +81,7 @@ myCorpus = Corpus(VectorSource(texto))
 
 ### Limpieza del Corpus
 
-- Con la función `tm_map` podemos iterar sobre el corpus aplicando una transformación sobre cada documento (se acuerdan de la librería `PURRR`?)
+- Con la función `tm_map` podemos iterar sobre el corpus aplicando una transformación sobre cada documento
 
 En este caso, para la limpieza utilizaremos las siguientes transformaciones.
 
@@ -90,7 +93,7 @@ En este caso, para la limpieza utilizaremos las siguientes transformaciones.
 myCorpus = tm_map(myCorpus, content_transformer(tolower))
 myCorpus = tm_map(myCorpus, removePunctuation)
 myCorpus = tm_map(myCorpus, removeNumbers)
-myCorpus = tm_map(myCorpus, removeWords, stopwords(kind = "en"))
+myCorpus = tm_map(myCorpus, removeWords, stopwords(kind = "es"))
 ```
 
 
@@ -129,8 +132,8 @@ str_remove_all(txt, pattern = expresion)
 Lo pasamos por el corpus
 
 ```{r}
-myCorpus = tm_map(myCorpus, content_transformer(function(x) str_remove_all(x, pattern = expresion)))
-myCorpus = tm_map(myCorpus, content_transformer(function(x) str_remove_all(x, pattern = '\n')))
+myCorpus = tm_map(myCorpus, content_transformer(function(x) str_replace_all(x, pattern = expresion, replacement = ' ')))
+myCorpus = tm_map(myCorpus, content_transformer(function(x) str_replace_all(x, pattern = '\n',replacement = ' ')))
 
 ```
 
@@ -138,8 +141,7 @@ myCorpus = tm_map(myCorpus, content_transformer(function(x) str_remove_all(x, pa
 inspect(myCorpus[1:10])
 ```
 
-
-Creamos una matriz de Término-documento
+Creamos una matriz de Término-documento. En el parámetro `control` aclaro el tamaño mínimo de las palabras con  minWordLength
 
 ```{r}
 myDTM = DocumentTermMatrix(myCorpus, control = list(minWordLength = 1))
@@ -150,6 +152,8 @@ myDTM = DocumentTermMatrix(myCorpus, control = list(minWordLength = 1))
 ```{r}
 inspect(myDTM)
 ```
+
+findMostFreqTerms sirve para encontrar las palabras más frecuentes por documento o grupo de documentos. Como sólo me interesa el corpus total, tengo que modificar el INDEX para que sea el mismo en todos los documentos.
 
 ```{r}
 palabras_frecuentes <- findMostFreqTerms(myDTM,n = 25, INDEX = rep(1,nDocs(myDTM)))[[1]]
@@ -177,15 +181,21 @@ dim(myDTM)
 dim(dtm)
 ```
 
+Entreno el modelo de LDA. `k` indica el número de tópicos (dimensiones latentes).
+
+- Como ejemplo de una manipulación más fina del algorítmo, modificamos el parámetro _delta_, que como sólo es modificable cuando se utiliza el método de optimización _Gibbs_, debemos especificar esto también en al parámetro `method`. _delta_ lo modificamos dentro del parámetro `control` que reúne varias especificaciones.
+
+- Delta es el parametro de la distribución _a priori_ de los términos sobre los tópicos. Esto ajusta cuanto comparten los términos los tópicos (por lo general buscamos que no compartan demasiados términos, dado que es más sencilla la interpretación).
 
 ```{r eval=FALSE}
 lda_fit <- LDA(dtm, k = 10,method = "Gibbs", control = list(delta=0.6,seed = 1234))
-lda_fit
+saveRDS(lda_fit,'resultados/lda_fit.rds')
 ```
 
 
 ```{r}
-saveRDS(lda_fit,'resultados/lda_fit.rds')
+lda_fit <- read_rds('resultados/lda_fit.rds')
+lda_fit
 ```
 
 

@@ -163,7 +163,7 @@ A veces para extraer pedazos de texto nos conviene chequear que hay antes y desp
 
 ![](img/lookaheads.png){width=300}
 
-Por ejemplo, si queremos recuerar el DNI de la persona entre muchas otras palabras:
+Por ejemplo, si queremos recuperar el DNI de la persona entre muchas otras palabras:
 
 ```{r}
 texto_con_dni <- 'Lorem ipsum dolor sit amet, DNI 38765239,faucibus et dui tellus, eros mi elit...'
@@ -248,7 +248,7 @@ $$
 - Las técincas de Modelado de Tópicos tratan de captar los temas de los que habla un corpus de texto.
 
 - Una de las técnicas más difundidas en la actualidad es [__Latent Dirichlet Allocation Models__](http://www.jmlr.org/papers/volume3/blei03a/blei03a.pdf)
-- Éste es un modelo inferencial bayesiano. No vamos a poder estdiar el detalle del modelo en este curso, pero a grandes rasgos propone un _proceso generativo_ donde cada palabra es el resultado de un encadenamiento de distribuciones, y luego se realiza _inferencia hacia atrás_ para calcular _la distribución más probable dada las palabras y los documentos_
+- Éste es un modelo inferencial bayesiano. No vamos a poder estudiar el detalle del modelo en este curso, pero a grandes rasgos propone un _proceso generativo_ donde cada palabra es el resultado de un encadenamiento de distribuciones, y luego se realiza _inferencia hacia atrás_ para calcular _la distribución más probable dada las palabras y los documentos_
 
 ![](img/grafo_lda.png){width=1000}
 
