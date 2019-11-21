@@ -162,10 +162,19 @@ palabras_frecuentes
 ```
 
 
+Armo un dataframe con esta información y elimino las palabras Bolivia y Evo, que fueron utilizadas para el scrapper y son por ello las más importantes
+
 ```{r}
 palabras_frecuentes <- tibble(word = names(palabras_frecuentes), freq =palabras_frecuentes)
 
-wordcloud2(palabras_frecuentes, shuffle = FALSE)
+palabras_frecuentes <- palabras_frecuentes %>% 
+  filter(!(word %in% c('bolivia','evo')))
+```
+
+
+Con el comando `wordcloud2` creo la nube de palabras
+```{r, fig.width=8, fig.height=8}
+wordcloud2(palabras_frecuentes)
 ```
 
 ### Topic Modeling
@@ -200,6 +209,7 @@ lda_fit
 
 
 ```{r}
+
 Terms <- terms(lda_fit, 10)
 Terms
 ```
